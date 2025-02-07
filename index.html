@@ -1,0 +1,221 @@
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Cardápio Digital Interativo</title> 
+    <style> 
+        body {  
+            font-family: Arial, sans-serif;  
+            background-color: #f8f9fa;  
+            color: #343a40;  
+            margin: 0;  
+            padding: 0;  
+        } 
+        .container {  
+            max-width: 800px;  
+            margin: 40px auto;  
+            padding: 20px;  
+            background-color: #ffffff;  
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);  
+            border-radius: 8px;  
+        } 
+        h1, h2 {  
+            color: #007bff;  
+        } 
+        .category {  
+            margin-bottom: 20px;  
+        } 
+        .item {  
+            margin-bottom: 10px;  
+        } 
+        .item label {  
+            display: block;  
+            padding: 10px;  
+            border: 1px solid #dee2e6;  
+            border-radius: 4px;  
+            transition: background-color 0.3s;  
+        } 
+        .item label:hover {  
+            background-color: #f1f1f1;  
+        } 
+        .cart {  
+            margin-top: 20px;  
+            padding: 20px;  
+            border: 1px solid #dee2e6;  
+            border-radius: 8px;  
+        } 
+        .cart-item {  
+            margin-bottom: 10px;  
+        } 
+        .total {  
+            font-weight: bold;  
+            margin-top: 10px;  
+            color: #28a745;  
+        } 
+        button {  
+            background-color: #007bff;  
+            color: white;  
+            border: none;  
+            padding: 10px 20px;  
+            border-radius: 4px;  
+            cursor: pointer;  
+            transition: background-color 0.3s;  
+        } 
+        button:hover {  
+            background-color: #0056b3;  
+        } 
+        .checkout {  
+            display: none;  
+            margin-top: 20px;  
+            padding: 20px;  
+            border: 1px solid #dee2e6;  
+            border-radius: 8px;  
+        } 
+        .checkout label {  
+            display: block;  
+            margin-bottom: 10px;  
+        } 
+        .checkout input[type="text"], .checkout input[type="radio"] {  
+            margin-top: 5px;  
+            margin-bottom: 15px;  
+        } 
+    </style> 
+</head> 
+<body> 
+    <div class="container"> 
+        <h1>Cardápio</h1> 
+ 
+        <div class="category"> 
+            <h2>Hambúrgueres</h2> 
+            <div class="item"> 
+                <label> 
+                    <input type="checkbox" class="menu-item" data-name="Hambúrguer Clássico" 
+data-price="15"> 
+                    Hambúrguer Clássico - R$15,00 
+                </label> 
+            </div> 
+            <div class="item"> 
+                <label> 
+                    <input type="checkbox" class="menu-item" data-name="Cheeseburger" data-price="18"> 
+                    Cheeseburger - R$18,00 
+                </label> 
+            </div> 
+        </div> 
+ 
+        <div class="category"> 
+            <h2>Salgados</h2> 
+            <div class="item"> 
+                <label> 
+                    <input type="checkbox" class="menu-item" data-name="Coxinha" data-price="6"> 
+                    Coxinha - R$6,00 
+                </label> 
+            </div> 
+            <div class="item"> 
+                <label> 
+                    <input type="checkbox" class="menu-item" data-name="Pastel" data-price="8"> 
+                    Pastel - R$8,00 
+                </label> 
+            </div> 
+        </div> 
+ 
+        <div class="category"> 
+            <h2>Bebidas</h2> 
+            <div class="item"> 
+                <label> 
+                    <input type="checkbox" class="menu-item" data-name="Refrigerante" data-price="5"> 
+                    Refrigerante - R$5,00 
+                </label> 
+            </div> 
+            <div class="item"> 
+                <label> 
+                    <input type="checkbox" class="menu-item" data-name="Suco" data-price="7"> 
+                    Suco - R$7,00 
+                </label> 
+            </div> 
+        </div> 
+ 
+        <div class="cart"> 
+            <h2>Carrinho de Compras</h2> 
+            <div id="cart-items"></div> 
+            <div class="total">Total: R$<span id="total-price">0</span></div> 
+            <button onclick="finalizeOrder()">Finalizar Pedido</button> 
+        </div> 
+ 
+        <div class="checkout"> 
+            <h2>Finalização do Pedido</h2> 
+            <label> 
+                Nome Completo: 
+                <input type="text" id="customer-name"> 
+            </label> 
+            <label> 
+                Endereço: 
+                <input type="text" id="customer-address"> 
+            </label> 
+            <h3>Formas de Pagamento</h3> 
+            <label><input type="radio" name="payment-method" value="cartão"> Cartão (Débito 
+ou Crédito)</label> 
+            <label><input type="radio" name="payment-method" value="pix"> Pix</label> 
+            <button onclick="confirmOrder()">Confirmar Pedido</button> 
+            <button onclick="cancelOrder()">Cancelar Pedido</button> 
+        </div> 
+    </div> 
+ 
+    <script> 
+        const cartItems = []; 
+ 
+        document.querySelectorAll('.menu-item').forEach(item => { 
+            item.addEventListener('change', event => { 
+                const name = event.target.dataset.name; 
+                const price = parseFloat(event.target.dataset.price); 
+                const quantity = 1; 
+ 
+                if (event.target.checked) { 
+                    cartItems.push({ name, price, quantity }); 
+                } else { 
+                    const index = cartItems.findIndex(cartItem => cartItem.name === name); 
+                    if (index !== -1) cartItems.splice(index, 1); 
+                } 
+                updateCart(); 
+            }); 
+        }); 
+ 
+        function updateCart() { 
+            const cartItemsContainer = document.getElementById('cart-items'); 
+            cartItemsContainer.innerHTML = ''; 
+            let total = 0; 
+            cartItems.forEach(item => { 
+                total += item.price * item.quantity; 
+                cartItemsContainer.innerHTML += ` 
+                    <div class="cart-item"> 
+                        ${item.name} - R$${item.price},00 x ${item.quantity} 
+                        <input type="number" min="1" value="${item.quantity}" 
+onchange="updateQuantity('${item.name}', this.value)"> 
+                    </div> 
+                `; 
+            }); 
+            document.getElementById('total-price').innerText = total; 
+        } 
+ 
+        function updateQuantity(name, quantity) { 
+            const item = cartItems.find(item => item.name === name); 
+            if (item) { 
+                item.quantity = parseInt(quantity); 
+                updateCart(); 
+            } 
+        } 
+ 
+        function finalizeOrder() { 
+            document.querySelector('.checkout').style.display = 'block'; 
+        } 
+ 
+        function confirmOrder() { 
+            alert('Pedido Confirmado! Obrigado pela compra.'); 
+            // Aqui você pode adicionar a lógica para enviar o pedido ao servidor 
+        } 
+function cancelOrder() { 
+alert('Pedido Cancelado.'); 
+} 
+</script> 
+</body> 
+</html>
